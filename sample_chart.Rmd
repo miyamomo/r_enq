@@ -1,0 +1,275 @@
+---
+title: "アンケートサンプル"
+author: "takasumi.miyamoto"
+date: "5/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=F}
+### ライブラリ
+#使用するライブラリのロード。基本はtdyverseで必要な処理に応じてライブラリを追加。
+
+library(tidyverse)
+library(scales) 
+library(caret) # dummyVars ダミー変数生成
+library(ggcorrplot) # ggcorrplot 相関行列
+# library(corrplot) # cor.plot
+# library(psych) 
+library(knitr) # knitr
+library(kableExtra)
+```
+
+```{r, include=F}
+### データ
+#### 1. csv読み込み
+# 対象csvを下記のディレクトリに配置した場合。
+setwd("~/Google Drive/Corporate04.PichDeckExpress/workspace/uniqlo/") #wdの指定
+ud <- read_csv("usample.csv")  
+```
+
+```{r, include=F}
+#### 2. 列名変更
+# 必ずしも必要ではない。Google Formアンケートでは質問項目の名称がそのまま列名として挿入される。集計時に列名としては冗長となる場合があるため簡素化。
+ud <- rename(ud, 時刻 = タイムスタンプ, 
+             レジ = レジの対応やスピード, 
+             売り場 = 売り場でのご案内, 
+             試着室 = 試着室でのご案内, 
+             裾直し = お裾直しの仕上がり, 
+             陳列 = 商品の選びやすさ, 
+             満足度 = 総合満足度)
+```
+```{r, include=F}
+#### 3. factorの順番指定
+#質的変数/factor の水準/level に対して、順番を明示的に指定。表にした際に並び順がバラバラにならないように。
+
+ud$性別 <- fct_relevel(ud$性別, "女性", "男性") 
+ud$来店曜日 <- fct_relevel(ud$来店曜日, "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日")
+ud$年齢 <- fct_relevel(ud$年齢, "20歳以下", "20代", "30代", "40代", "50代", "60歳以上") 
+ud$来店時間 <- fct_relevel(ud$来店時間, "7am - 9 am", "10am - 12am", "13 pm - 15pm", "16pm - 18pm", "19pm - 21pm") 
+ud$来店店舗 <- fct_relevel(ud$来店店舗, "店舗A", "店舗B", "店舗C", "店舗D", "店舗E") 
+#*参照 R Graphics Cookbook <https://r-graphics.org/recipe-dataprep-factor-reorder>
+```
+
+## 「満足度」集計
+
+```{r, echo=F}
+ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(満足度, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%  kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+## 項目間の相関関係
+### 項目同士で関係がある
+```{r, include=F}
+### データ
+#### 1. ダミー変数生成
+#対象となる変数を指定、質的変数/カテゴリカルデータを抽出してダミー変数（0,1）に置き換え。
+ud_dumm <- dummyVars(~., data = ud[2:12]) #2行目以降をダミー変数化
+ud_dumm <- as.data.frame(predict(ud_dumm, ud)) 
+```
+
+```{r, include=F}
+#### 2. 相関行列
+#相関行列表。scaleで正規化してcorで相関行列を生成、小数点以下をroundして表示。
+ud_dumm %>% scale() %>% cor() %>% round(1) #表
+```
+
+```{r, include=F}
+#### 3. 相関の検定
+#ggcorrplotのcor_pmat で相関の検討を行列で表示。
+ud_dumm %>% scale() %>% cor_pmat() %>% round(1)  #表
+```
+
+* 相関係数
+  * プラスの値：正の相関（赤） / マイナスの値：負の相関（青）
+  * 1/-1に近くほど強い相関、0は無相関
+* 一定の相関が認められる項目を表示
+  * 有意水準 p値0.05未満
+
+```{r, echo=F}
+ggcorrplot(corr = ud_dumm %>% scale() %>% cor(),
+           p.mat = ud_dumm %>% scale() %>% cor_pmat(),
+           sig.level = 0.05, # p値 5% で統計的有意水準
+           method = "circle",
+           hc.order = F, type = "upper",
+           insig = "blank",# pch = 4, pch.cex = 8, sig.level = 0.05,
+           outline.color = "white", lab = TRUE) +
+  theme(axis.text = element_text(family = "HiraKakuPro-W3"))
+```
+
+## CS・顧客満足度分析
+
+### CS分析 ポートフォリオ
+```{r, include=F}
+#### 1. 重要度偏差値
+#目的変数と説明変数の相関を算出して偏差値化。正規化のタイミングはこれで正しいかあとで確認。
+ud.x <- cor(ud[,7:11], ud[,12]) %>% scale() * 10 + 50 #重要度 偏差値```
+
+#### 2. 評価偏差値
+#説明変数ごとの平均を算出して偏差値化。
+ud.y <- colMeans(ud[,7:11]) %>% scale() * 10 + 50 #評価 偏差値
+
+#### 4. CS改善度
+#重要度と偏差値の列をバインドして列名を変更。
+ud.cs <- cbind(ud.x, ud.y) #列バインド
+colnames(ud.cs) <- c("重要度", "評価") #列名変更 
+ud.cs <- data.frame(ud.cs) # data.frame化
+
+# CS改善度指数の算出。参考 CS改善度 <https://walking-elephant.blogspot.com/2012/12/csexcel.html>
+ud.csd <- ud.cs %>% mutate(
+  距離 = sqrt((重要度 - 50)^2 + (評価 -50)^2), 
+  修正角度指数 = ((90 - abs(atan2(重要度 - 50, 評価 -50) * 180 / pi - 45)) / 90),
+  改善度 = 距離 * 修正角度指数)
+```
+
+```{r, echo=F}
+ggplot(ud.cs, aes(重要度, 評価)) + geom_point(size = 2) + 
+  geom_text(aes(label = rownames(ud.cs)), family = "HiraKakuPro-W3", size = 4, vjust = -1) +
+  ylim(30, 70) + xlim(30, 70)
+```
+
+### CS分析 改善度表
+```{r, echo=F}
+rownames(ud.csd) <- rownames(ud.cs)
+round(ud.csd[,-(3:4)], 1) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+
+## 単純集計
+
+### 性別
+```{r, echo=F}
+ud %>% count(性別) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(性別, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(性別) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 年齢
+```{r, echo=F}
+ud %>% count(年齢) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(年齢, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(年齢) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 来店曜日
+```{r, echo=F}
+ud %>% count(来店曜日) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(来店曜日, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(来店曜日) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 来店時間
+```{r, echo=F}
+ud %>% count(来店時間) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(来店時間, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(来店時間) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 来店店舗
+```{r, echo=F}
+ud %>% count(来店店舗) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(来店店舗, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(来店店舗) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### レジ
+```{r, echo=F}
+ud %>% count(レジ) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(レジ, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(レジ) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 売り場
+```{r, echo=F}
+ud %>% count(売り場) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(売り場, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(売り場) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 試着室
+```{r, echo=F}
+ud %>% count(試着室) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(試着室, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(試着室) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 裾直し
+```{r, echo=F}
+ud %>% count(裾直し) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(裾直し, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(裾直し) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+### 陳列
+```{r, echo=F}
+ud %>% count(陳列) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
+  ggplot(aes(陳列, n)) + geom_col() + 
+  geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +
+  ylab("回答数")
+```
+
+```{r, echo=F}
+ud %>% count(陳列) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left")
+```
+
+
+## 回帰分析(検討中)
+
+```{r}
+lm(満足度~., ud_dumm) %>% summary
+```
+
