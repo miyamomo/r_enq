@@ -64,7 +64,7 @@ ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %
 ```
 
 ```{r, echo=F}
-ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%  kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%  kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ## 相関係数
@@ -148,7 +148,7 @@ ggplot(ud.cs, aes(重要度, 評価)) + geom_point(size = 2) +
 ### CS分析 改善度表
 ```{r, echo=F}
 rownames(ud.csd) <- rownames(ud.cs)
-round(ud.csd[,-(3:4)], 1) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+round(ud.csd[,-(3:4)], 1) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 
@@ -163,7 +163,7 @@ ud %>% count(性別) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
 ```
 
 ```{r, echo=F}
-ud %>% count(性別) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(性別) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 年齢
@@ -175,7 +175,7 @@ ud %>% count(年齢) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
 ```
 
 ```{r, echo=F}
-ud %>% count(年齢) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(年齢) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 来店曜日
@@ -187,7 +187,7 @@ ud %>% count(来店曜日) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)
 ```
 
 ```{r, echo=F}
-ud %>% count(来店曜日) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(来店曜日) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 来店時間
@@ -199,7 +199,7 @@ ud %>% count(来店時間) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)
 ```
 
 ```{r, echo=F}
-ud %>% count(来店時間) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(来店時間) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 来店店舗
@@ -211,7 +211,7 @@ ud %>% count(来店店舗) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)
 ```
 
 ```{r, echo=F}
-ud %>% count(来店店舗) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(来店店舗) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### レジ
@@ -223,7 +223,7 @@ ud %>% count(レジ) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
 ```
 
 ```{r, echo=F}
-ud %>% count(レジ) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(レジ) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 売り場
@@ -235,7 +235,7 @@ ud %>% count(売り場) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %
 ```
 
 ```{r, echo=F}
-ud %>% count(売り場) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(売り場) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 試着室
@@ -247,7 +247,7 @@ ud %>% count(試着室) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %
 ```
 
 ```{r, echo=F}
-ud %>% count(試着室) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(試着室) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 裾直し
@@ -259,7 +259,7 @@ ud %>% count(裾直し) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %
 ```
 
 ```{r, echo=F}
-ud %>% count(裾直し) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(裾直し) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 ### 陳列
@@ -271,7 +271,7 @@ ud %>% count(陳列) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
 ```
 
 ```{r, echo=F}
-ud %>% count(陳列) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "center", bootstrap_options = c("striped", "hover"))
+ud %>% count(陳列) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>% kable() %>% kable_styling(full_width = F, position = "left", bootstrap_options = c("striped", "hover"))
 ```
 
 
