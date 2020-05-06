@@ -53,9 +53,9 @@ ud$来店時間 <- fct_relevel(ud$来店時間, "7am - 9 am", "10am - 12am", "13
 ud$来店店舗 <- fct_relevel(ud$来店店舗, "店舗A", "店舗B", "店舗C", "店舗D", "店舗E") 
 #*参照 R Graphics Cookbook <https://r-graphics.org/recipe-dataprep-factor-reorder>
 ```
-
+  
 ## 「満足度」集計
-
+  
 ```{r, echo=F}
 ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
   ggplot(aes(満足度, n)) + geom_col() + 
@@ -67,8 +67,8 @@ ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %
 ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%  kable() %>% kable_styling(full_width = F, position = "left")
 ```
 
-## 項目間の相関関係
-### 項目同士で関係がある
+## 相関係数
+### 項目同士で相関が認められるものを表示
 ```{r, include=F}
 ### データ
 #### 1. ダミー変数生成
@@ -89,21 +89,29 @@ ud_dumm %>% scale() %>% cor() %>% round(1) #表
 ud_dumm %>% scale() %>% cor_pmat() %>% round(1)  #表
 ```
 
-* 相関係数
-  * プラスの値：正の相関（赤） / マイナスの値：負の相関（青）
-  * 1/-1に近くほど強い相関、0は無相関
-* 一定の相関が認められる項目を表示
+* 数値の意味
+  * 相関係数で1〜-1で表現
+  * 1（もしくは-1）に近くほど強い相関、0は無相関
+  * プラスの値：正の相関（赤）、マイナスの値：負の相関（青）
+* 表示されているセルと表示されていないセルの違い
+  * 一定の相関が認められる項目を表示
   * 有意水準 p値0.05未満
+* ggcorrplot
+  * https://cran.r-project.org/web/packages/ggcorrplot/ggcorrplot.pdf
 
 ```{r, echo=F}
 ggcorrplot(corr = ud_dumm %>% scale() %>% cor(),
-           p.mat = ud_dumm %>% scale() %>% cor_pmat(),
-           sig.level = 0.05, # p値 5% で統計的有意水準
-           method = "circle",
-           hc.order = F, type = "upper",
+           p.mat = ud_dumm %>% scale() %>% cor_pmat(), # P値
            insig = "blank",# pch = 4, pch.cex = 8, sig.level = 0.05,
-           outline.color = "white", lab = TRUE) +
-  theme(axis.text = element_text(family = "HiraKakuPro-W3"))
+           show.legend = TRUE, legend.title = "soukan", #凡例
+           show.diag = F, # 主対角線の表示
+           sig.level = 0.05, # p値 5% で統計的有意水準
+           method = "circle", # 丸表示 or square
+           hc.order = F, type = "upper",
+           outline.color = "white",
+           lab = TRUE,  lab_size = 3, #相関係数の表示
+           tl.cex = 8, tl.col = "black", tl.srt = 90) +
+  theme(axis.text = element_text(family = "HiraKakuPro-W3", size = rel(0.5))) 
 ```
 
 ## CS・顧客満足度分析
