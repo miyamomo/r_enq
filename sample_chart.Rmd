@@ -1,5 +1,5 @@
 ---
-title: "アンケートサンプル"
+title: "CS・顧客満足アンケート分析（サンプル）"
 author: "takasumi.miyamoto"
 date: "5/4/2020"
 output: html_document
@@ -90,7 +90,7 @@ ud_dumm %>% scale() %>% cor_pmat() %>% round(1)  #表
 ```
 
 * 数値の意味
-  * 相関係数で1〜-1で表現
+  * 相関の度合いを1〜-1で表現
   * 1（もしくは-1）に近くほど強い相関、0は無相関
   * プラスの値：正の相関（赤）、マイナスの値：負の相関（青）
 * 表示されているセルと表示されていないセルの違い
@@ -103,7 +103,7 @@ ud_dumm %>% scale() %>% cor_pmat() %>% round(1)  #表
 ggcorrplot(corr = ud_dumm %>% scale() %>% cor(),
            p.mat = ud_dumm %>% scale() %>% cor_pmat(), # P値
            insig = "blank",# pch = 4, pch.cex = 8, sig.level = 0.05,
-           show.legend = TRUE, legend.title = "soukan", #凡例
+           show.legend = TRUE, legend.title = "keisu", #凡例
            show.diag = F, # 主対角線の表示
            sig.level = 0.05, # p値 5% で統計的有意水準
            method = "circle", # 丸表示 or square
