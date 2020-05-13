@@ -3,6 +3,8 @@ title: "CS・顧客満足アンケート分析（サンプル）"
 author: "takasumi.miyamoto"
 date: "5/4/2020"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -57,6 +59,8 @@ ud$来店店舗 <- fct_relevel(ud$来店店舗, "店舗A", "店舗B", "店舗C",
 ## 「満足度」集計
   
 ```{r, echo=F}
+library(psych)
+describe(ud)
 ud %>% count(満足度) %>% mutate(pct = percent( n / sum(n) %>% round(2), 1)) %>%
   ggplot(aes(満足度, n)) + geom_col() + 
   geom_text(aes(label = paste(n, "\n", pct)), color = "white", vjust = 1.5) +

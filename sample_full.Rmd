@@ -19,10 +19,10 @@ library(tidyverse)
 library(scales) 
 library(caret) # dummyVars ダミー変数生成
 library(ggcorrplot) # ggcorrplot 相関行列
-# library(corrplot) # cor.plot
-# library(psych) 
 library(knitr) # knitr
 library(kableExtra)
+# library(corrplot) # cor.plot
+# library(psych)  #describe
 ```
 
 ### データ
