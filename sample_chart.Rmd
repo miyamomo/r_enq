@@ -30,7 +30,8 @@ library(kableExtra)
 #### 1. csv読み込み
 # 対象csvを下記のディレクトリに配置した場合。
 setwd("~/Google Drive/Corporate04.PichDeckExpress/workspace/uniqlo/") #wdの指定
-ud <- read_csv("usample.csv")  
+ud <- read_csv("usample.csv")
+
 ```
 
 ```{r, include=F}

@@ -30,8 +30,9 @@ library(kableExtra)
 #### 1. csv読み込み
 対象csvを下記のディレクトリに配置した場合。
 ```{r,  message=FALSE}
-setwd("~/Google Drive/Corporate04.PichDeckExpress/workspace/uniqlo/") #wdの指定
-ud <- read_csv("usample.csv")  
+getwd()
+setwd("~/Google Drive/Corporate04.PichDeckExpress/workspace/") #wdの指定
+ud <- read_csv("uniqlo/usample.csv")  
 ```
 
 #### 2. 列名変更
@@ -48,9 +49,9 @@ ud <- rename(ud, 時刻 = タイムスタンプ,
 #### 3. factorの順番指定
 質的変数/factor の水準/level に対して、順番を明示的に指定。表にした際に並び順がバラバラにならないように。
 ```{r}
-ud$性別 <- fct_relevel(ud$性別, "女性", "男性") 
-ud$来店曜日 <- fct_relevel(ud$来店曜日, "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日")
+ud$性別 <- as.factor(ud$性別) 
 ud$年齢 <- fct_relevel(ud$年齢, "20歳以下", "20代", "30代", "40代", "50代", "60歳以上") 
+ud$来店曜日 <- as.factor(ud$来店曜日)
 ud$来店時間 <- fct_relevel(ud$来店時間, "7am - 9 am", "10am - 12am", "13 pm - 15pm", "16pm - 18pm", "19pm - 21pm") 
 ud$来店店舗 <- fct_relevel(ud$来店店舗, "店舗A", "店舗B", "店舗C", "店舗D", "店舗E") 
 ```
